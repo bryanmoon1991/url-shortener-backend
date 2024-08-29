@@ -1,4 +1,6 @@
-const ZooKeeper = require('zookeeper');
+import ZooKeeper from 'zookeeper';
+// const ZooKeeper = require('zookeeper');
+
 const host = 'localhost:2181';
 const tokenPath = '/token';
 
