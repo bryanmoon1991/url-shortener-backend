@@ -1,5 +1,4 @@
 import ZooKeeper from 'zookeeper';
-// const ZooKeeper = require('zookeeper');
 
 const host = 'localhost:2181';
 const tokenPath = '/token';
@@ -39,7 +38,8 @@ let setTokenRange = async (token: number) => {
   let dataToSet = Buffer.from(String(token), 'utf8');
 
   try {
-    const stat = await zkClient.set(tokenPath, dataToSet);
+    const stat = await zkClient.exists(tokenPath, false);
+    await zkClient.set(tokenPath, dataToSet, stat.version);
   } catch (error) {
     console.log(error);
     return;
@@ -50,7 +50,7 @@ let setTokenRange = async (token: number) => {
 
 let getTokenRange = async () => {
   try {
-    const [stat, data] = await zkClient.get(tokenPath);
+    const [stat, data] = await zkClient.get(tokenPath, false);
     console.log(
       `Data retrieved from path ${tokenPath}:`,
       data.toString('utf8')
@@ -73,7 +73,7 @@ let createToken = async () => {
     const path = await zkClient.create(
       tokenPath,
       buffer,
-      ZooKeeper.CreateMode.PERSISTENT
+      ZooKeeper.constants.ZOO_PERSISTENT
     );
     console.log('Node: %s is created.', path);
   } catch (error) {
@@ -86,7 +86,7 @@ let createToken = async () => {
 
 let checkIfTokenExists = async () => {
   try {
-    const stat = await zkClient.exists(tokenPath);
+    const stat = await zkClient.exists(tokenPath, false);
     if (stat) {
       console.log('Node exists: %s', stat);
     } else {
@@ -98,9 +98,10 @@ let checkIfTokenExists = async () => {
   }
 };
 
-let removeToken = () => {
+let removeToken = async () => {
   try {
-    zkClient.delete_(tokenPath);
+    const stat = await zkClient.exists(tokenPath, false);
+    zkClient.delete_(tokenPath, stat.version);
     console.log('Node is deleted.');
   } catch (error) {
     if (error) {
@@ -118,7 +119,7 @@ let connectZK = async () => {
     console.log('hello', range.start);
   });
 
-  zkClient.init();
+  zkClient.init({});
 };
 
 module.exports = {
