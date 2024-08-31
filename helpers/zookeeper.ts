@@ -16,13 +16,13 @@ function createClient(timeoutMs = 5000) {
 
 const zkClient = createClient();
 
-let range = {
+export const range = {
   start: 0,
   end: 0,
   curr: 0,
 };
 
-let hashGenerator = (n: number) => {
+export const hashGenerator = (n: number) => {
   let hash = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
   let hash_str = '';
 
@@ -34,7 +34,7 @@ let hashGenerator = (n: number) => {
   return hash_str;
 };
 
-let setTokenRange = async (token: number) => {
+const setTokenRange = async (token: number) => {
   let dataToSet = Buffer.from(String(token), 'utf8');
 
   try {
@@ -48,7 +48,7 @@ let setTokenRange = async (token: number) => {
   console.log('Data is set.');
 };
 
-let getTokenRange = async () => {
+export const getTokenRange = async () => {
   try {
     const [stat, data] = await zkClient.get(tokenPath, false);
     console.log(
@@ -66,7 +66,7 @@ let getTokenRange = async () => {
   }
 };
 
-let createToken = async () => {
+const createToken = async () => {
   let buffer = Buffer.from('0', 'utf8');
 
   try {
@@ -84,7 +84,7 @@ let createToken = async () => {
   }
 };
 
-let checkIfTokenExists = async () => {
+const checkIfTokenExists = async () => {
   try {
     const stat = await zkClient.exists(tokenPath, false);
     if (stat) {
@@ -98,7 +98,7 @@ let checkIfTokenExists = async () => {
   }
 };
 
-let removeToken = async () => {
+export const removeToken = async () => {
   try {
     const stat = await zkClient.exists(tokenPath, false);
     zkClient.delete_(tokenPath, stat.version);
@@ -111,7 +111,7 @@ let removeToken = async () => {
   }
 };
 
-let connectZK = async () => {
+export const connectZK = async () => {
   zkClient.on('connect', () => {
     console.log('Connected to the ZK server.');
     checkIfTokenExists();
@@ -122,13 +122,3 @@ let connectZK = async () => {
   zkClient.init({});
 };
 
-module.exports = {
-  range,
-  hashGenerator,
-  setTokenRange,
-  getTokenRange,
-  createToken,
-  checkIfTokenExists,
-  removeToken,
-  connectZK,
-};
