@@ -41,7 +41,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_url_visits: {
+        Args: {
+          input_hash: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
